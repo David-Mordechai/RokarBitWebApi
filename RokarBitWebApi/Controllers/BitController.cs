@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using RokarBitWebApi.Models;
+using RokarBitWebApi.Services;
 
 namespace RokarBitWebApi.Controllers;
 
@@ -7,62 +8,82 @@ namespace RokarBitWebApi.Controllers;
 [Route("[controller]/[action]")]
 public class BitController : ControllerBase
 {
-    private readonly ILogger<BitController> _logger;
-    private readonly Settings _settings;
+    private readonly IBitService _bitService;
 
-    public BitController(ILogger<BitController> logger, Settings settings)
+    public BitController(IBitService bitService)
     {
-        _logger = logger;
-        _settings = settings;
+        _bitService = bitService;
     }
 
     [HttpGet]
-    public BitReplayDto Connect()
+    public ReplayMessageDto Connect()
     {
-        _logger.LogInformation("Connect requested");
-        var result = new BitReplayDto
+        try
         {
-            Success = true,
-        };
-        result.Data.Add("Go_NoGo", true);
-        return result;
+            _bitService.Connect();
+            return new ReplayMessageDto { Success = true };
+        }
+        catch (Exception e)
+        {
+            return new ReplayMessageDto
+            {
+                Success = false,
+                ErrorMessage = e.Message
+            };
+        }
     }
 
     [HttpGet]
-    public BitReplayDto Disconnect()
+    public ReplayMessageDto Disconnect()
     {
-        _logger.LogInformation("Disconnect requested");
-        var result = new BitReplayDto
+        try
         {
-            Success = true,
-        };
-        result.Data.Add("Go_NoGo", true);
-        return result;
+            _bitService.Disconnect();
+            return new ReplayMessageDto { Success = true };
+        }
+        catch (Exception e)
+        {
+            return new ReplayMessageDto
+            {
+                Success = false,
+                ErrorMessage = e.Message
+            };
+        }
     }
 
     [HttpGet]
-    public BitReplayDto PowerBit()
+    public BitReplayMessageDto GetPowerBit()
     {
-        _logger.LogInformation("PowerBit requested");
-        var result = new BitReplayDto
+        try
         {
-            Success = true,
-        };
-        result.Data.Add("Go_NoGo", true);
-        return result;
+            var data = _bitService.GetPowerBit();
+            return new BitReplayMessageDto { Success = true, Data = data };
+        }
+        catch (Exception e)
+        {
+            return new BitReplayMessageDto
+            {
+                Success = false,
+                ErrorMessage = e.Message
+            };
+        }
     }
 
     [HttpGet]
-    public BitReplayDto ContinuousBit()
+    public BitReplayMessageDto GetContinuousBit()
     {
-        _logger.LogInformation("ContinuousBit requested");
-
-        var result = new BitReplayDto
+        try
         {
-            Success = false,
-            ErrorMessage = "Could not connect to serial port."
-        };
-
-        return result;
+            var data = _bitService.GetContinuousBit();
+            return new BitReplayMessageDto { Success = true, Data = data };
+        }
+        catch (Exception e)
+        {
+            return new BitReplayMessageDto
+            {
+                Success = false,
+                ErrorMessage = e.Message
+            };
+        }
     }
 }
