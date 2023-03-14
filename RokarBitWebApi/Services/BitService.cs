@@ -17,16 +17,15 @@ public class BitService : IBitService
     {
         try
         {
-            if (string.IsNullOrEmpty(_serialPort.Name))
-            {
-                // at first request to connect the serial port name will be empty
-                // perform here the logic of finding the serial port
-                // if serial port was found then set the settings.SerialPort.Name with this port for the next usage.
-                // note that this setting will be available as long as this application running
-                // foreach request until service will go down,
-                _serialPort.Name = "com0";
-            }
+            var serialPort = _serialPort.Name;
             // logic to connect to serial port
+            // 1. try to connect to serialPort
+            // 2. wait 5 seconds for response
+            // 3. if connect to serialPort fail
+            // 3.1 get all serial ports
+            // 3.2 loop all serial ports and try to connect with interval of 5 seconds
+            // 3.3 if none of the ports connected successfully trow exception with error "Connect Fail"
+            // 4. if connect success update _serialPort.Name with this serial port name
         }
         catch (Exception e)
         {
